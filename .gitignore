@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+/.qmake.stash
+/build-quazip-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug/*
+/debug/*
+/Makefile
+/Makefile.Debug
+/Makefile.Release
+/MizEdit.pro.user
