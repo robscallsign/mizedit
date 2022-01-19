@@ -10,6 +10,7 @@ WARNING: this is an early release and may have bugs, use at your own peril.
 ## Description
 Typically when DCS mods like the A-4E-C, VNAO T-45, or the VSN F104G are added to multiplayer missions, all clients need all of the modules to join the server. This can limit the adoption of mods in multiplayer servers.  A DCS .miz archive is simply a zip file, and inside this zip file there is a "mission" file containing the Lua code for the mission.  It is possible to edit the "requiredModules" portion of the mission lua table and remove mods.  This allows people to join without having the mod, but they see a default Su-25 for that aircraft.
 
+The portion of the mission file inside the .miz archive looks like this:
 ```
     ["requiredModules"] = 
     {
@@ -20,7 +21,7 @@ Typically when DCS mods like the A-4E-C, VNAO T-45, or the VSN F104G are added t
     }, -- end of ["requiredModules"]
 ```
 
-can be edited to:
+and it can be edited to:
 
 ```
     ["requiredModules"] = 
