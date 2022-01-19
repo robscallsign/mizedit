@@ -29,6 +29,16 @@ Although conceptually simple, the above steps require unzipping the .miz file so
 - NO means to append _mizedit to the filename of the new mission file, preserving the old mission
 - CANCEL means no files will be edited or written
 
-** TIPS **
+The list of modules that are going to be ignored are located in the Modules.txt file in the MizEdit folder.  Each line of this file contains a mod that will be removed from the requiredModules lua table.  It uses a sub-string search, so A-4E could be used and it will remove any lines containing the A-4E from the requiredModules lua table.
+
+The default provided Modules.txt contains:
+
+```
+F104
+T-45
+A-4E-C
+```
+
+**TIPS**
 - DO NOT HAVE THE .MIZ FILE OPEN IN THE MISSION EDITOR WHEN YOU TRY TO USE MIZEDIT TO EDIT THAT MISSION
 - Multiple mission files can be selected using combiantions of control+click, shift+click
