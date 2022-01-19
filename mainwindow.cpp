@@ -9,10 +9,6 @@
 #include <QTextEdit>
 #include <QTemporaryDir>
 
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
-#include <quazip/JlCompress.h>
-
 #include "mizedit.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -20,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("MizEdit v0.1");
 }
 
 MainWindow::~MainWindow()
@@ -29,165 +26,9 @@ MainWindow::~MainWindow()
 
 namespace {
 
-bool extractFile(const QString &filename)
-{
-//    QuaZip zip(filename);
-//    zip.open(QuaZip::mdUnzip);
-
-//    QuaZipFile file(&zip);
-
-//    for(bool f=zip.goToFirstFile(); f; f=zip.goToNextFile()) {
-//        file.open(QIODevice::ReadOnly);
-//        //same functionality as QIODevice::readData() -- data is a char*, maxSize is qint64
-//        file.readData(data,maxSize);
-//        //do something with the data
-//        file.close();
-//    }
-
-//    zip.close();
-    return true;
-}
-
-bool writeMission(const QString &filename, const QByteArray &mission)
-{
-    QuaZip zip(filename);
-
-    zip.open(QuaZip::mdAdd);
-
-    if (!zip.isOpen()) {
-        qDebug() << "miz file is not open.";
-        return false;
-    }
-
-//    qDebug() << "miz file entries: " << zip.getEntriesCount();
-
-    QuaZipFile file(&zip);
-
-//    if (!zip.setCurrentFile("mission")) {
-//        qDebug() << "Error mission not found in .miz archive.";
-//        return false;
-//    }
-
-    file.open(QIODevice::WriteOnly, QuaZipNewInfo("mission"));
-
-
-    if (!file.isOpen()) {
-        qDebug() << "Error, unable to open mission file for writing.";
-        return false;
-    }
-    file.write(mission);
-    file.write("Rob was here");
-    file.close();
-
-    qDebug() << "File written ok.";
-    return true;
-}
-
-bool editMission(const QString &filename, QByteArray &output)
-{
-    QuaZip zip(filename);
-
-    zip.open(QuaZip::mdUnzip);
-
-    if (!zip.isOpen()) {
-        qDebug() << "miz file is not open.";
-        return false;
-    }
-
-    qDebug() << "miz file entries: " << zip.getEntriesCount();
-
-
-    QuaZipFile file(&zip);
-
-//    zip.goToFirstFile();
-    if (!zip.setCurrentFile("mission")) {
-        qDebug() << "Error mission not found in .miz archive";
-        return false;
-    }
-
-    qDebug() << "Current file name inside zip archive: " << zip.getCurrentFileName();
-
-    file.open(QIODevice::ReadOnly);
-
-    if (!file.isOpen()) {
-        qDebug() << "Error, unable to open mission file within the miz file archive.";
-        return false;
-    }
-
-    auto sz = file.size();
-    qDebug() << "File Size is: " << sz;
-
-    QByteArray data = file.readAll();
-
-//    QByteArray output;
-    output.reserve(data.size()); // pre-allocate to the original data size
-    QStringList stringList;
-    auto sp = data.split('\n');
-
-    bool inRequiredModules = false;
-    for (int i=0; i < sp.size(); ++i) {
-        if (sp[i].contains("requiredModules")) {
-            qDebug() << "Found line: " << sp[i];
-            inRequiredModules = true;
-        }
-
-        bool appendLine = true;
-        if (inRequiredModules) {
-            if (sp[i].contains("A-4E-C")) {
-                qDebug() << "Found A-4E-C, ignoring this line";
-                appendLine = false;
-            }
-
-            // stop searching in the required modules section
-             // once the closing } is detected
-            if (sp[i].contains("}")) {
-                inRequiredModules = false;
-            }
-        }
-
-        // build the output QByteArray
-        if (appendLine) {
-            output.append(sp[i]);
-
-            // don't add a newline on the very last one I guess
-            if (i != sp.size()-1) {
-                output.append('\n');
-            }
-        }
-    }
-
-    QFile outfile("C:/temp/output_mission.txt");
-    outfile.open(QIODevice::WriteOnly);
-    outfile.write(output);
-    outfile.close();
-
-    QFile outfile2("C:/temp/input_mission.txt");
-    outfile2.open(QIODevice::WriteOnly);
-    outfile2.write(data);
-    outfile2.close();
-
-//    for (const auto &s : sp) {
-//        qDebug() << s;
-//    }
-
-//    QStringList ls(data);
-
-//    qDebug() << "String list size: " << ls.size();
-
-//    Another way to
-//    qDebug() << "lineCount: " << lineCount;
-//    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-//    QString sval = codec->toUnicode(data);
-
-//    edit->setPlainText(data);
-//    edit->setPlainText(data);
-
-    return true;
-}
 }
 void MainWindow::on_actionOpen_Miz_File_triggered()
 {
-
     auto modules = mizedit::getModulesList();
 
     for (const auto &s : modules) {
@@ -218,21 +59,18 @@ void MainWindow::on_actionOpen_Miz_File_triggered()
         return;
     }
 
-    bool overwriteMission = true;
+    QString appendName = "_mizedit";
     if (reply == QMessageBox::Yes) {
-        // overwrite
-    } else {
-        // append _mizedit to the filename before the .miz extension
-        overwriteMission = false;
+        appendName = "";
     }
 
+    // set the QPlainTextEdit widget for the message log
+    mizedit::logMessage("",ui->plainTextEdit);
 
-    for (int i = 0; i < files.size(); ++i) {
-        qDebug() << "Opening: " << files.at(i);
-        QByteArray output;
-        extractFile(files.at(i));
-//        editMission(files.at(i), output);
-//        writeMission(files.at(i),output);
+    const auto modsToIgnore = mizedit::getModulesList();
+    if (!mizedit::editAllMissions(files, modsToIgnore, appendName)) {
+        // something wrong happened, popup a QMessageBox
+        mizedit::logMessage("Some error occured.");
     }
 }
 

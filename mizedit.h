@@ -3,6 +3,7 @@
 
 #include <QStringList>
 
+class QPlainTextEdit;
 namespace mizedit {
 
 bool fileExists(const QString &path);
@@ -17,6 +18,13 @@ QString getModuleFile();
 // reads the modules.txt file and returns a QStringList of the modules to be excluded
 QStringList getModulesList();
 
+// Pass in a QString the full filename of the .miz file
+// and it returns a QByteArray of the modified mission file
+bool editMission(const QString &filename, const QStringList &modules, QByteArray &output);
 
+bool editAllMissions(const QStringList &missions, const QStringList &modules, const QString appendName = "");
+
+
+void logMessage(const QString &message, QPlainTextEdit *edit=nullptr );
 }
 #endif // MIZEDIT_H

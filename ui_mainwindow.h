@@ -99,7 +99,6 @@ public:
         menubar->addAction(menuFile->menuAction());
         menubar->addAction(menuOptions->menuAction());
         menuFile->addAction(actionOpen_Miz_File);
-        menuFile->addAction(actionApply_to_all_in_dir);
         menuOptions->addAction(actionEdit_Module_L_ist);
 
         retranslateUi(MainWindow);

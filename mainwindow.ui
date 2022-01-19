@@ -50,7 +50,6 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen_Miz_File"/>
-    <addaction name="actionApply_to_all_in_dir"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
