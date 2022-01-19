@@ -1,5 +1,11 @@
 # MizEdit
+MizEdit - a small utility to remove DCS modules from the "requiredModules" lua table inside the DCS .miz archive.
 
+## DOWNLOAD
+The latest version can be found on the release page, download it here:
+https://github.com/robscallsign/mizedit/releases/download/v0.1/MizEdit_v0.1.zip
+
+## Description
 Typically when DCS mods like the A-4E-C, VNAO T-45, or the VSN F104G are added to multiplayer missions, all clients need all of the modules to join the server. This can limit the adoption of mods in multiplayer servers.  A DCS .miz archive is simply a zip file, and inside this zip file there is a "mission" file containing the Lua code for the mission.  It is possible to edit the "requiredModules" portion of the mission lua table and remove mods.  This allows people to join without having the mod, but they see a default Su-25 for that aircraft.
 
 ```
